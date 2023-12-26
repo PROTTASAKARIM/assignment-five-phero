@@ -15,19 +15,20 @@ const calculateBetweenWeeks = catchAsync(async (req, res, next) => {
   // console.log(startDate,endDate)
   // console.log(start,end)
   if (durationInWeeks) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'durationInWeeks should come from Start and End date');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'durationInWeeks should come from Start and End date',
+    );
   }
-if(startDate && endDate){
-  const timeDifference = (end.getTime() - start.getTime()) as number;
+  if (startDate && endDate) {
+    const timeDifference = (end.getTime() - start.getTime()) as number;
 
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
 
-  const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+    const weeks = Math.ceil(timeDifference / oneWeekInMilliseconds);
 
-  const weeks = Math.ceil(timeDifference / oneWeekInMilliseconds);
-
-
-  req.body.durationInWeeks = weeks;
-}
+    req.body.durationInWeeks = weeks;
+  }
 
   // return weeks;
   next();

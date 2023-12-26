@@ -22,53 +22,63 @@ const detailsSchema = new Schema<TDetails>({
     trim: true,
   },
 });
-const courseSchema = new Schema<TCourse>({
-  title: {
-    type: String,
-    unique: true,
-    trim: true,
-    required: true,
+const courseSchema = new Schema<TCourse>(
+  {
+    title: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: true,
+    },
+    instructor: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    tags: [tagSchema],
+    startDate: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    endDate: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    language: {
+      type: String,
+      trim: true,
+      // required: true,
+    },
+    provider: {
+      type: String,
+      trim: true,
+      // required: true,
+    },
+    durationInWeeks: {
+      type: Number,
+      // required: true,
+    },
+    details: detailsSchema,
+    // createdBy: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'User',
+    //   required: true,
+    // },
   },
-  instructor: {
-    type: String,
-    trim: true,
-    required: true,
+  {
+    timestamps: true,
   },
-  categoryId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  tags: [tagSchema],
-  startDate: {
-    type: String,
-    trim: true,
-    required: true,
-  },
-  endDate: {
-    type: String,
-    trim: true,
-    required: true,
-  },
-  language: {
-    type: String,
-    trim: true,
-    // required: true,
-  },
-  provider: {
-    type: String,
-    trim: true,
-    // required: true,
-  },
-  durationInWeeks: {
-    type: Number,
-    // required: true,
-  },
-  details: detailsSchema,
-});
+);
 
 export const Course = model<TCourse>('Course', courseSchema);

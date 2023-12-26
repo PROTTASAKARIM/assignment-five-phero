@@ -11,62 +11,87 @@ const createCourseIntoDB = async (payload: TCourse) => {
   return result;
 };
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getAllCoursesFromDB = async (query:any) => {
- // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
- const {page,limit ,sortBy,sortOrder ,minPrice,maxPrice,tags,startDate,endDate,language,provider,durationInWeeks,level,
-} = query ;
-const aggregationPipeline : AggregationStage[]= [{
-  $match:{}
-}]
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-console.log(query)
-
-if (startDate) {
-  aggregationPipeline.push({ $match: { startDate: { $gte: startDate } } });
-}
-if (endDate) {
-  aggregationPipeline.push({ $match: { endDate: { $lte: endDate } } });
-}
-if(minPrice){
-  aggregationPipeline.push({ $match: {price:{ $gte: parseFloat(minPrice) }} });
-}
-if(maxPrice){
-  aggregationPipeline.push({ $match: {price:{ $lte: parseFloat(maxPrice) }} });
-}
-if(language){
-  aggregationPipeline.push({ $match: {language:language} });
-}
-if(durationInWeeks){
-  aggregationPipeline.push({ $match: {durationInWeeks:{ $eq: parseFloat(durationInWeeks) }} });
-}
-if(level){
-  aggregationPipeline.push({ $match: { "details.level": level} });
-}
-if(provider){
-  aggregationPipeline.push({ $match:{provider:provider}});
-}
-if(tags){
-  aggregationPipeline.push({ $match:{'tags.name':tags}});
-}
-if (sortBy) {
+const getAllCoursesFromDB = async (query: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const {
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    minPrice,
+    maxPrice,
+    tags,
+    startDate,
+    endDate,
+    language,
+    provider,
+    durationInWeeks,
+    level,
+  } = query;
+  const aggregationPipeline: AggregationStage[] = [
+    {
+      $match: {},
+    },
+  ];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sortStage:any = { $sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 } };
-  aggregationPipeline.push(sortStage);
-}
-const pageNow = parseFloat(page) || 1;
-const limitNow = parseFloat(limit) || 10;
-const skip = (pageNow - 1) * limitNow;
-aggregationPipeline.push({ $skip: skip });
-aggregationPipeline.push({ $limit: limitNow });
+  console.log(query);
 
-console.log(aggregationPipeline)
+  if (startDate) {
+    aggregationPipeline.push({ $match: { startDate: { $gte: startDate } } });
+  }
+  if (endDate) {
+    aggregationPipeline.push({ $match: { endDate: { $lte: endDate } } });
+  }
+  if (minPrice) {
+    aggregationPipeline.push({
+      $match: { price: { $gte: parseFloat(minPrice) } },
+    });
+  }
+  if (maxPrice) {
+    aggregationPipeline.push({
+      $match: { price: { $lte: parseFloat(maxPrice) } },
+    });
+  }
+  if (language) {
+    aggregationPipeline.push({ $match: { language: language } });
+  }
+  if (durationInWeeks) {
+    aggregationPipeline.push({
+      $match: { durationInWeeks: { $eq: parseFloat(durationInWeeks) } },
+    });
+  }
+  if (level) {
+    aggregationPipeline.push({ $match: { 'details.level': level } });
+  }
+  if (provider) {
+    aggregationPipeline.push({ $match: { provider: provider } });
+  }
+  if (tags) {
+    aggregationPipeline.push({ $match: { 'tags.name': tags } });
+  }
+  if (sortBy) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sortStage: any = {
+      $sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 },
+    };
+    aggregationPipeline.push(sortStage);
+  }
+  const pageNow = parseFloat(page) || 1;
+  const limitNow = parseFloat(limit) || 10;
+  const skip = (pageNow - 1) * limitNow;
+  aggregationPipeline.push({ $skip: skip });
+  aggregationPipeline.push({ $limit: limitNow });
 
-  const result = await Course.aggregate(aggregationPipeline)
-  const totalData= await Course.countDocuments()
+  console.log(aggregationPipeline);
 
-  return {result:result,meta:{page:pageNow,limit:limitNow,total:totalData}};
+  const result = await Course.aggregate(aggregationPipeline);
+  const totalData = await Course.countDocuments();
+
+  return {
+    result: result,
+    meta: { page: pageNow, limit: limitNow, total: totalData },
+  };
 };
 const getCourseReviews = async (_id: string) => {
   const result = await Course.findOne({ _id });
@@ -140,11 +165,15 @@ const updateOneCourse = async (id: string, payload: Partial<TCourse>) => {
         modifiedUpdatedData[`details.${key}`] = value;
       }
     }
-    const updateWithoutTags = await Course.findByIdAndUpdate(id, modifiedUpdatedData, {
-      new: true,
-      runValidators: true,
-      session
-    });
+    const updateWithoutTags = await Course.findByIdAndUpdate(
+      id,
+      modifiedUpdatedData,
+      {
+        new: true,
+        runValidators: true,
+        session,
+      },
+    );
 
     if (!updateWithoutTags) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update Course');
@@ -175,9 +204,7 @@ const updateOneCourse = async (id: string, payload: Partial<TCourse>) => {
       }
 
       // filter out the new course fields
-      const newTags = tags?.filter(
-        (el) => el.name && !el.isDeleted,
-      );
+      const newTags = tags?.filter((el) => el.name && !el.isDeleted);
 
       const newTagsUpdated = await Course.findByIdAndUpdate(
         id,
@@ -198,7 +225,7 @@ const updateOneCourse = async (id: string, payload: Partial<TCourse>) => {
     await session.commitTransaction();
     await session.endSession();
 
-    const result= await Course.findById(id)
+    const result = await Course.findById(id);
     return result;
   } catch (err) {
     console.log(err);

@@ -3,7 +3,6 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { CourseServices } from './course.services';
 
-
 const createCourse = catchAsync(async (req, res) => {
   const result = await CourseServices.createCourseIntoDB(req.body);
 
@@ -16,14 +15,14 @@ const createCourse = catchAsync(async (req, res) => {
 });
 
 const getAllCourse = catchAsync(async (req, res) => {
-  const query= req.query;
+  const query = req.query;
   const result = await CourseServices.getAllCoursesFromDB(query);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Courses are retrieved successfully',
-    meta:result.meta,
+    meta: result.meta,
     data: result.result,
   });
 });

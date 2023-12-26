@@ -10,7 +10,7 @@ app.use(cors());
 app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World! This is Assignment 3 By Prottasa Karim');
+  res.send('Hello World! This is Assignment 4 By Prottasa Karim');
 });
 app.use(globalErrorHandler);
 

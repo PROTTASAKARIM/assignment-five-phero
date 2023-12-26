@@ -30,6 +30,7 @@ const courseValidationSchema = z.object({
     provider: z.string(),
     // durationInWeeks: z.number(),
     details: detailsValidationSchema.optional(),
+    // createdBy: z.string(),
   }),
 });
 const courseValidationUpdateSchema = z.object({
@@ -45,10 +46,11 @@ const courseValidationUpdateSchema = z.object({
     provider: z.string().optional(),
     // durationInWeeks: z.number(),
     details: detailsValidationUpdateSchema.optional(),
+    // createdBy: z.string().optional(),
   }),
 });
 
 export const courseValidations = {
   courseValidationSchema,
-  courseValidationUpdateSchema
+  courseValidationUpdateSchema,
 };

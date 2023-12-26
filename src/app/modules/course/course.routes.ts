@@ -17,6 +17,11 @@ router.get('/courses', CourseControllers.getAllCourse);
 router.get('/courses/:courseId/reviews', CourseControllers.getOneCourseReviews);
 router.get('/course/best', CourseControllers.getBestCourseOnRatings);
 
-router.put('/courses/:courseId',calculateBetweenWeeks, validateRequest(courseValidations.courseValidationUpdateSchema), CourseControllers.updateCourse);
+router.put(
+  '/courses/:courseId',
+  calculateBetweenWeeks,
+  validateRequest(courseValidations.courseValidationUpdateSchema),
+  CourseControllers.updateCourse,
+);
 
 export const CourseRoutes = router;

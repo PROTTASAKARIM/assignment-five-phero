@@ -87,9 +87,10 @@ const changePassword = async (
 
   const previousPasswordsMatching = userDetails?.previousPassword?.length;
 
+
   if (
     previousPasswordsMatching !== undefined &&
-   previousPasswordsMatching <= 2
+   (previousPasswordsMatching >0  || previousPasswordsMatching <= 2)
   ) {
     // userDetails?.previousPassword?.map(async (prevPassword) => {
     //   const match = await bcrypt.compare(
@@ -128,6 +129,8 @@ const changePassword = async (
 
 
   }
+
+
 
   const matchNewPassword = await bcrypt.compare(
     payload.newPassword,

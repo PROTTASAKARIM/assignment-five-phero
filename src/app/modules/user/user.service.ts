@@ -57,8 +57,8 @@ const changePassword = async (
   userData: JwtPayload,
   payload: TChangePassword,
 ) => {
-  console.log('payload', payload);
-  console.log('userData', userData);
+  // console.log('payload', payload);
+  // console.log('userData', userData);
   const userDetails = await User.findById(userData._id, {
     _id: 1,
     username: 1,
@@ -70,7 +70,7 @@ const changePassword = async (
     createdAt: 1,
     updatedAt: 1,
   });
-  console.log('userDetails', userDetails);
+  // console.log('userDetails', userDetails);
   if (!userDetails) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
@@ -89,20 +89,44 @@ const changePassword = async (
 
   if (
     previousPasswordsMatching !== undefined &&
-    (previousPasswordsMatching >= 1 || previousPasswordsMatching <= 2)
+   previousPasswordsMatching <= 2
   ) {
-    userDetails?.previousPassword?.map(async (prevPassword) => {
-      const match = await bcrypt.compare(
-        payload.currentPassword,
-        prevPassword.password,
-      );
-      if (match) {
+    // userDetails?.previousPassword?.map(async (prevPassword) => {
+    //   const match = await bcrypt.compare(
+    //     payload.currentPassword,
+    //     prevPassword.password,
+    //   );
+    //   if (match) {
+    //     throw new AppError(
+    //       httpStatus.NOT_FOUND,
+    //       `Can not give last 2 password`,
+    //     );
+    //   }
+    // });
+    
+   
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const matchPromises :any = userDetails?.previousPassword?.map(async (prevPassword) => {
+        // const hashPassword = await bcrypt.hash(
+        //   payload.currentPassword,
+        //   Number(config.bcrypt_salt_rounds),
+        // );
+        const match = await bcrypt.compare(payload.currentPassword, prevPassword.password);
+        return match;
+      });
+
+      const matches = await Promise.all(matchPromises);
+      
+      if (matches.some((match) => match)) {
+        console.log("match",match)
         throw new AppError(
-          httpStatus.UNAUTHORIZED,
-          `You Can not Use the Last 2 Passwords. Give Another Password`,
+          httpStatus.NOT_FOUND,
+          `Cannot use one of the last 2 passwords`,
         );
       }
-    });
+    
+
+
   }
 
   const matchNewPassword = await bcrypt.compare(
@@ -111,7 +135,7 @@ const changePassword = async (
   );
   if (matchNewPassword) {
     throw new AppError(
-      httpStatus.UNAUTHORIZED,
+      httpStatus.NOT_FOUND,
       `You Can not Use the same Password. Give a new Password`,
     );
   }
@@ -131,10 +155,12 @@ const changePassword = async (
 
   if (
     previousPasswordsMatching !== undefined &&
-    previousPasswordsMatching === 2
+    previousPasswordsMatching <= 2
   ) {
     const previousPasswordArray = userDetails.previousPassword;
-    previousPasswordArray?.shift();
+    if(previousPasswordsMatching===2){
+      previousPasswordArray?.shift();
+    }
   
 
     previousPasswordArray?.push(prev);

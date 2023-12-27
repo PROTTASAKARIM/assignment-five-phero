@@ -24,8 +24,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
     const matchedUser = await User.findById(_id);
 
-    console.log('matchedUser', matchedUser);
-    console.log(requiredRoles);
+    // console.log('matchedUser', matchedUser);
+    // console.log(requiredRoles);
 
     if (!matchedUser) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -43,7 +43,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       }
     }
 
-    console.log('time', matchedUser?.createdAt?.getTime());
+    // console.log('time', matchedUser?.createdAt?.getTime());
 
     req.user = decoded as JwtPayload & { role: string };
     next();

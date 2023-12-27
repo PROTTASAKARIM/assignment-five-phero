@@ -1,10 +1,11 @@
 import httpStatus from 'http-status';
 import AppError from '../../errors/Apperror';
-import { TLoginUser, TUser } from './user.interface';
+import { TChangePassword, TLoginUser, TUser } from './user.interface';
 import { User } from './user.model';
 import config from '../../config';
 import bcrypt from 'bcrypt'
 import { createToken } from './user.utilies';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createUserIntoDB = async (payload: Partial<TUser>) => {
   const result = await User.create(payload);
@@ -39,10 +40,26 @@ const loginUser = async (payload: TLoginUser) => {
   );
   console.log(accessToken)
 
-  return null
+  const userDetails={
+    _id: user._id,
+    username: user.username,
+    role: user.role,
+    email:user.email
+  }
+
+  return {user:userDetails,token:accessToken}
 };
+
+const changePassword=( payload:TChangePassword)=>{
+console.log(payload)
+}
+const changePassword1=( userData: JwtPayload,payload:TChangePassword)=>{
+console.log(payload)
+}
 
 export const UserServices = {
   createUserIntoDB,
   loginUser,
+  changePassword,
+  changePassword1
 };

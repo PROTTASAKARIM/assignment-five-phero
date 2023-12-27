@@ -22,17 +22,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
     const { _id, role, iat } = decoded;
 
-    const matchedUser = await User.findById(_id, {
-      _id: 1,
-      username: 1,
-      email: 1,
-      password: 1,
-      role: 1,
-      previousPassword: 1,
-      passwordChangedAt: 1,
-      createdAt: 1,
-      updatedAt: 1,
-    });
+    const matchedUser = await User.findById(_id);
 
     console.log('matchedUser', matchedUser);
     console.log(requiredRoles);
@@ -46,11 +36,11 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
     const passwordChangeTime = matchedUser?.passwordChangedAt?.getTime();
     if (matchedUser?.passwordChangedAt) {
-        if(iat !== undefined){
-            if (passwordChangeTime as number > iat  ) {
-              throw new AppError(httpStatus.UNAUTHORIZED, 'Please Login again');
-            }
+      if (iat !== undefined) {
+        if ((passwordChangeTime as number) > iat) {
+          throw new AppError(httpStatus.UNAUTHORIZED, 'Please Login again');
         }
+      }
     }
 
     console.log('time', matchedUser?.createdAt?.getTime());

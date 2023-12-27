@@ -25,6 +25,27 @@ const userValidationSchema = z.object({
     previousPassword: z.array(previousPasswordSchema).optional(),
   }),
 });
+const newPasswordValidation = z.object({
+  body: z.object({
+    currentPassword: z.string(),
+    newPassword: z
+      .string()
+      .min(8, {
+        message: 'Your NewPassword must be at least 8 characters long',
+      })
+      .refine((value) => /[A-Z]/.test(value), {
+        message: 'Your NewPassword must contain at least one uppercase letter',
+      })
+      .refine((value) => /\d/.test(value), {
+        message: 'Password must contain at least one digit',
+      })
+      .refine((value) => /[!@#$%^&*()_+{}\\[\]:;<>,.?~\\/\\-]/.test(value), {
+        message: 'Your NewPassword must contain at least one special character',
+      }),
+  }),
+});
+
 export const userValidations = {
   userValidationSchema,
+  newPasswordValidation,
 };

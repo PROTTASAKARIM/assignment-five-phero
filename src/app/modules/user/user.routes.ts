@@ -18,6 +18,7 @@ router.post('/login', UserControllers.loginUser);
 router.post(
   '/change-password',
   auth(USER_ROLE.admin, USER_ROLE.user),
+  validateRequest(userValidations.newPasswordValidation),
   UserControllers.changePassword,
 );
 

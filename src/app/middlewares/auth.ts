@@ -1,34 +1,62 @@
-import httpStatus from "http-status";
-import AppError from "../errors/Apperror";
-import catchAsync from "../utils/catchAsync";
-import config from "../config";
+import httpStatus from 'http-status';
+import AppError from '../errors/Apperror';
+import catchAsync from '../utils/catchAsync';
+import config from '../config';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { TUserRole } from "../modules/user/user.interface";
-import { NextFunction, Request, Response } from "express";
+import { TUserRole } from '../modules/user/user.interface';
+import { NextFunction, Request, Response } from 'express';
+import { User } from '../modules/user/user.model';
 
 const auth = (...requiredRoles: TUserRole[]) => {
-    return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-      const token = req.headers.authorization;
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization;
 
-      // checking if the token is missing
-      if (!token) {
-        throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
-      }
-  
-      // checking if the given token is valid
-      const decoded = jwt.verify(
-        token,
-        config.jwt_access_secret as string,
-      ) as JwtPayload;
-  
-    //   const { role, userId, iat } = decoded;
-  
-     
- console.log(requiredRoles)
- console.log(decoded)
-  
-     
-      next();
+    if (!token) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+    }
+
+    const decoded = jwt.verify(
+      token,
+      config.jwt_access_secret as string,
+    ) as JwtPayload;
+
+    const { _id, role, iat } = decoded;
+
+    const matchedUser = await User.findById(_id, {
+      _id: 1,
+      username: 1,
+      email: 1,
+      password: 1,
+      role: 1,
+      previousPassword: 1,
+      passwordChangedAt: 1,
+      createdAt: 1,
+      updatedAt: 1,
     });
-  };
-  export default auth;
+
+    console.log('matchedUser', matchedUser);
+    console.log(requiredRoles);
+
+    if (!matchedUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+    }
+
+    if (requiredRoles && !requiredRoles.includes(role)) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+    }
+    const passwordChangeTime = matchedUser?.passwordChangedAt?.getTime();
+    if (matchedUser?.passwordChangedAt) {
+        if(iat !== undefined){
+            if (passwordChangeTime as number > iat  ) {
+              throw new AppError(httpStatus.UNAUTHORIZED, 'Please Login again');
+            }
+        }
+    }
+
+    console.log('time', matchedUser?.createdAt?.getTime());
+
+    req.user = decoded as JwtPayload & { role: string };
+    next();
+  });
+};
+export default auth;

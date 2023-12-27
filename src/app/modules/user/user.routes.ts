@@ -14,14 +14,11 @@ router.post(
   cryptPassword,
   UserControllers.createUser,
 );
+router.post('/login', UserControllers.loginUser);
 router.post(
-    '/login',
-    UserControllers.loginUser
-)
-router.post(
-    '/change-password',
-    auth(USER_ROLE.admin,USER_ROLE.user),
-    UserControllers.changePassword
-)
+  '/change-password',
+  auth(USER_ROLE.admin, USER_ROLE.user),
+  UserControllers.changePassword,
+);
 
 export const UserRoutes = router;

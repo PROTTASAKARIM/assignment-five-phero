@@ -1,4 +1,4 @@
-import { USER_ROLE } from "./user.constent";
+import { USER_ROLE } from './user.constent';
 
 export type TPreviousPassword = {
   password: string;

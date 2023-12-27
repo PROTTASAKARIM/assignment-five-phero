@@ -22,29 +22,27 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
-const loginUser= catchAsync(async (req,res)=>{
-  const result= await UserServices.loginUser(req.body)
+const loginUser = catchAsync(async (req, res) => {
+  const result = await UserServices.loginUser(req.body);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'User login successful',
     data: result,
   });
-})
-const changePassword= catchAsync(async (req,res)=>{
-  console.log(req.header)
-  const result= await UserServices.changePassword(req.body)
+});
+const changePassword = catchAsync(async (req, res) => {
+  const result = await UserServices.changePassword(req.user, req.body);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Password changed successfully',
     data: result,
   });
-})
-
+});
 
 export const UserControllers = {
   createUser,
   loginUser,
-  changePassword
+  changePassword,
 };

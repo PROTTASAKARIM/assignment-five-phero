@@ -138,7 +138,7 @@ const getAllCoursesFromDB = async (query: any) => {
   const totalData = await Course.countDocuments();
 
   return {
-    result: result,
+    result: {courses:result},
     meta: { page: pageNow, limit: limitNow, total: totalData },
   };
 };

@@ -1,13 +1,29 @@
 # Live Link of Project (https://l2-assignment3-peach.vercel.app)
 
 ## Two Users 
-User Type 
+User Type {
 username : user,
-password : User_12345
+password : User_12345 }
 
-Admin Type 
+```
+{
+    "username": "user",
+    "password": "User_12345"
+}
+
+```
+
+Admin Type{ 
 username: admin,
-password: Admin_123'
+password: Admin_123'}
+
+```
+{
+    "username": "admin",
+    "password": "Admin_123'"
+}
+
+```
 
 # Run Project Locally
 Clone get repository and run npm install. So all the dependencies will be install.

@@ -2,11 +2,11 @@
 
 ## Two Users 
 User Type 
-username : user
+username : user,
 password : User_12345
 
 Admin Type 
-username: admin
+username: admin,
 password: Admin_123'
 
 # Run Project Locally

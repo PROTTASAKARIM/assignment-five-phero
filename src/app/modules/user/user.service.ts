@@ -87,32 +87,55 @@ const changePassword = async (
 
   const previousPasswordsMatching = userDetails?.previousPassword?.length;
 
+  // if(userDetails?.previousPassword?.length !== undefined &&  userDetails?.previousPassword !== undefined &&
+  //   userDetails?.previousPassword?.length == 1 ){
+
+  //     const match = await bcrypt.compare(
+  //       payload.newPassword,
+  //       userDetails?.previousPassword[0]?.password,
+  //     );
+  //     if (match) {
+  //       throw new AppError(
+  //         httpStatus.NOT_FOUND,
+  //         `You can not use the same last 1 passwords`,
+  //       );
+  //     }
+  //   }
+  // if(previousPasswordsMatching !== undefined &&  userDetails?.previousPassword !== undefined &&
+  //   previousPasswordsMatching == 2 ){
+  //     const match1 = await bcrypt.compare(
+  //       payload.newPassword,
+  //       userDetails?.previousPassword[0]?.password,
+  //     );
+  //     if (match1) {
+  //       throw new AppError(
+  //         httpStatus.NOT_FOUND,
+  //         `You can not use the same last 2 passwords`,
+  //       );
+  //     }
+  //     const match2 = await bcrypt.compare(
+  //       payload.newPassword,
+  //       userDetails?.previousPassword[1]?.password,
+  //     );
+  //     if (match2) {
+  //       throw new AppError(
+  //         httpStatus.NOT_FOUND,
+  //         `You can not use the same last 3 passwords`,
+  //       );
+  //     }
+  //   }
 
   if (
     previousPasswordsMatching !== undefined &&
    (previousPasswordsMatching >0  || previousPasswordsMatching <= 2)
   ) {
-    // userDetails?.previousPassword?.map(async (prevPassword) => {
-    //   const match = await bcrypt.compare(
-    //     payload.currentPassword,
-    //     prevPassword.password,
-    //   );
-    //   if (match) {
-    //     throw new AppError(
-    //       httpStatus.NOT_FOUND,
-    //       `Can not give last 2 password`,
-    //     );
-    //   }
-    // });
-    
-   
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const matchPromises :any = userDetails?.previousPassword?.map(async (prevPassword) => {
         // const hashPassword = await bcrypt.hash(
         //   payload.currentPassword,
         //   Number(config.bcrypt_salt_rounds),
         // );
-        const match = await bcrypt.compare(payload.currentPassword, prevPassword.password);
+        const match = await bcrypt.compare(payload.newPassword, prevPassword.password);
         return match;
       });
 
@@ -121,16 +144,11 @@ const changePassword = async (
       if (matches.some((match) => match)) {
         console.log("match",match)
         throw new AppError(
-          httpStatus.NOT_FOUND,
+          httpStatus.BAD_REQUEST,
           `Cannot use one of the last 2 passwords`,
         );
       }
-    
-
-
   }
-
-
 
   const matchNewPassword = await bcrypt.compare(
     payload.newPassword,
@@ -138,7 +156,7 @@ const changePassword = async (
   );
   if (matchNewPassword) {
     throw new AppError(
-      httpStatus.NOT_FOUND,
+      httpStatus.BAD_REQUEST,
       `You Can not Use the same Password. Give a new Password`,
     );
   }
@@ -149,40 +167,38 @@ const changePassword = async (
   );
   const passwordChangedAt = new Date();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let newPreviousPasswords :any = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const prev: any = {
-      password: userDetails.password,
-      changeTime: passwordChangedAt ? passwordChangedAt : userDetails.createdAt,
-    };
+  let newPreviousPasswords: any = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const prev: any = {
+    password: userDetails.password,
+    changeTime: passwordChangedAt ? passwordChangedAt : userDetails.createdAt,
+  };
 
   if (
     previousPasswordsMatching !== undefined &&
     previousPasswordsMatching <= 2
   ) {
     const previousPasswordArray = userDetails.previousPassword;
-    if(previousPasswordsMatching===2){
+    if (previousPasswordsMatching === 2) {
       previousPasswordArray?.shift();
     }
-  
 
     previousPasswordArray?.push(prev);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-    newPreviousPasswords=previousPasswordArray;
-  }else{
+    newPreviousPasswords = previousPasswordArray;
+  } else {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-    newPreviousPasswords=[prev]
+    newPreviousPasswords = [prev];
   }
 
-const updatedData={
-  password:newPassword,
-  passwordChangedAt: new Date(),
-  previousPassword:newPreviousPasswords
-}
+  const updatedData = {
+    password: newPassword,
+    passwordChangedAt: new Date(),
+    previousPassword: newPreviousPasswords,
+  };
 
-const update= await User.findByIdAndUpdate(userData._id,updatedData)
-return update
-
+  const update = await User.findByIdAndUpdate(userData._id, updatedData);
+  return update;
 };
 
 export const UserServices = {

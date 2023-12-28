@@ -26,7 +26,12 @@ password: Admin_123'}
 ```
 
 # Run Project Locally
-Clone get repository and run npm install. So all the dependencies will be install.
+Clone get repository and run npm install.
+```
+npm i
+```
+
+ So all the dependencies will be install.
 Then To build with 
 ```
 npm run build
@@ -35,6 +40,8 @@ TO run the server give this command
 ```
 npm run start:dev
 ```
+
+# Local Routes
 After starting the server. We can run our project locally on http://localhost:5000/ and we can access the routes
 ## POST a user in http://localhost:5000/api/auth/register
 ## Login A User with using POST in http://localhost:5000/api/auth/login

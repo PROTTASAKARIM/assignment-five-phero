@@ -143,8 +143,8 @@ const getAllCoursesFromDB = async (query: any) => {
   };
 };
 const getCourseReviews = async (_id: string) => {
-  const result = await Course.findOne({ _id });
-  const reviews = await Review.find({ courseId: _id });
+  const result = await Course.findOne({ _id }).populate('createdBy',{_id:1,username:1,email:1,role:1});
+  const reviews = await Review.find({ courseId: _id }).populate('createdBy',{_id:1,username:1,email:1,role:1});
 
   return { course: result, reviews: reviews };
 };
@@ -179,6 +179,32 @@ const getBestCourseOnRatings = async () => {
       },
     },
     {
+      $lookup: {
+        from: 'users',
+        let: { createdBy: '$createdBy' }, // Variable to store the value of 'createdBy'
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$_id', '$$createdBy'] }, // Match the '_id' of 'users' with 'createdBy'
+            },
+          },
+          {
+            $project: {
+              _id: 1, 
+              username: 1,
+              email: 1,
+              role: 1,
+          
+            },
+          },
+        ],
+        as: 'createdBy',
+      },
+    },
+    {
+      $unwind: '$createdBy',
+    },
+    {
       $project: {
         _id: 1,
         title: 1,
@@ -190,6 +216,7 @@ const getBestCourseOnRatings = async () => {
         endDate: 1,
         language: 1,
         provider: 1,
+        createdBy:1,
         durationInWeeks: 1,
         details: 1,
         averageRating: 1,

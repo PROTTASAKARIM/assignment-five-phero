@@ -5,9 +5,11 @@ import mongoose from 'mongoose';
 import AppError from '../../errors/Apperror';
 import httpStatus from 'http-status';
 import { AggregationStage } from '../../utils/aggreagtionType';
+import { JwtPayload } from 'jsonwebtoken';
 
-const createCourseIntoDB = async (payload: TCourse) => {
-  const result = await Course.create(payload);
+const createCourseIntoDB = async (userData: JwtPayload,payload: TCourse) => {
+  const data={...payload,createdBy:userData._id}
+  const result = await Course.create(data);
   return result;
 };
 

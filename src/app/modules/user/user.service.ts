@@ -141,11 +141,15 @@ const changePassword = async (
 
       const matches = await Promise.all(matchPromises);
       
+      const filteredPassword= userDetails?.previousPassword?.filter( async prev=>{
+        await bcrypt.compare(payload.newPassword, prev.password)
+      })
+
       if (matches.some((match) => match)) {
         console.log("match",match)
         throw new AppError(
           httpStatus.BAD_REQUEST,
-          `Cannot use one of the last 2 passwords`,
+          `Password change failed. Ensure the new password is unique and not among the last 2 used ${ filteredPassword !== undefined ? filteredPassword[0]?.changeTime : ""}`,
         );
       }
   }

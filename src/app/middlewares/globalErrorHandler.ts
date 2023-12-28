@@ -51,7 +51,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   } else if (err instanceof AppError) {
     statusCode = err?.statusCode;
     message = err.message;
-    errorMessage = err.message;
+    errorMessage = err.message ==='Unauthorized Access' ? 'You do not have the necessary permissions to access this resource.':err.message;
     errorSources = [
       {
         path: '',
@@ -71,7 +71,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
   return res.status(statusCode).json({
     success: false,
-    statusCode: statusCode,
+    // statusCode: statusCode,
     message,
     errorMessage,
     err,

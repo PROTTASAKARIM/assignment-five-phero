@@ -14,7 +14,7 @@ router.post(
   cryptPassword,
   UserControllers.createUser,
 );
-router.post('/login', UserControllers.loginUser);
+router.post('/login',  validateRequest(userValidations.loginValidationSchema),UserControllers.loginUser);
 router.post(
   '/change-password',
   auth(USER_ROLE.admin, USER_ROLE.user),

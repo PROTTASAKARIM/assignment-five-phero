@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+const loginValidationSchema = z.object({
+  body: z.object({
+  username: z.string(),
+  password: z.string(),
+})});
 const previousPasswordSchema = z.object({
   password: z.string().optional(),
   changeTime: z.string().optional(),
@@ -47,5 +52,6 @@ const newPasswordValidation = z.object({
 
 export const userValidations = {
   userValidationSchema,
+  loginValidationSchema,
   newPasswordValidation,
 };

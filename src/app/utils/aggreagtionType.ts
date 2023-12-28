@@ -4,4 +4,6 @@ export type AggregationStage =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { $sort: Record<string, any> }
   | { $skip: number }
-  | { $limit: number };
+  | { $limit: number }
+  | { $lookup: { from: string; localField: string; foreignField: string; as: string } }
+  | { $unwind: string };

@@ -22,6 +22,7 @@ router.get('/course/best', CourseControllers.getBestCourseOnRatings);
 
 router.put(
   '/courses/:courseId',
+  auth(USER_ROLE.admin),
   calculateBetweenWeeks,
   validateRequest(courseValidations.courseValidationUpdateSchema),
   CourseControllers.updateCourse,

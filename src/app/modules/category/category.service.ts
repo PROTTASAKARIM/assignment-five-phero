@@ -9,7 +9,7 @@ const createCategoryIntoDB = async (userData: JwtPayload,payload: TCategory) => 
 };
 
 const getAllCategoryFromDB = async () => {
-  const result = await Category.find();
+  const result = await Category.find().populate('createdBy',{_id:1,username:1,email:1,role:1});
   return result;
 };
 

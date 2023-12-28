@@ -4,4 +4,7 @@ export type TReview = {
   courseId: Types.ObjectId;
   rating: number;
   review: string;
+  createdBy: Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

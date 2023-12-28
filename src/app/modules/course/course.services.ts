@@ -4,7 +4,7 @@ import { Review } from '../review/review.model';
 import mongoose from 'mongoose';
 import AppError from '../../errors/Apperror';
 import httpStatus from 'http-status';
-import { AggregationStage } from '../../utils/aggreagtionType';
+// import { AggregationStage } from '../../utils/aggreagtionType';
 import { JwtPayload } from 'jsonwebtoken';
 
 const createCourseIntoDB = async (userData: JwtPayload,payload: TCourse) => {
@@ -31,11 +31,58 @@ const getAllCoursesFromDB = async (query: any) => {
     durationInWeeks,
     level,
   } = query;
-  const aggregationPipeline: AggregationStage[] = [
+  // const aggregationPipeline: AggregationStage[] = [
+  //   {
+  //     $match: {},
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'users',
+  //       localField: 'createdBy',
+  //       foreignField: '_id',
+  //       as: 'createdBy',
+  //     },
+  //   },
+  //   {
+  //     $unwind: '$createdBy'
+  //   }
+  // ];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const aggregationPipeline: any = [
     {
       $match: {},
     },
+    {
+      $lookup: {
+        from: 'users',
+        let: { createdBy: '$createdBy' }, // Variable to store the value of 'createdBy'
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$_id', '$$createdBy'] }, // Match the '_id' of 'users' with 'createdBy'
+            },
+          },
+          {
+            $project: {
+              _id: 1, 
+              username: 1,
+              email: 1,
+              role: 1,
+          
+            },
+          },
+        ],
+        as: 'createdBy',
+      },
+    },
+    {
+      $unwind: '$createdBy',
+    },
+    // Add more stages as needed
   ];
+  
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   console.log(query);
 
@@ -227,7 +274,7 @@ const updateOneCourse = async (id: string, payload: Partial<TCourse>) => {
     await session.commitTransaction();
     await session.endSession();
 
-    const result = await Course.findById(id);
+    const result = await Course.findById(id).populate('createdBy',{_id:1,username:1,email:1,role:1});
     return result;
   } catch (err) {
     console.log(err);

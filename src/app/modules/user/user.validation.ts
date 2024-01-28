@@ -13,7 +13,7 @@ const previousPasswordSchema = z.object({
 const userValidationSchema = z.object({
   body: z.object({
     username: z.string(),
-    email: z.string(),
+    // email: z.string().optional(),
     password: z
       .string()
       .min(8, { message: 'Password must be at least 8 characters long' })

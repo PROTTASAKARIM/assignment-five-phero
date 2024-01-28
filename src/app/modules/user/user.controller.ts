@@ -8,7 +8,7 @@ const createUser = catchAsync(async (req, res) => {
   const showResult = {
     _id: result._id,
     username: result.username,
-    email: result.email,
+    // email: result.email,
     role: result.role,
     createdAt: result.createdAt,
     updatedAt: result.updatedAt,

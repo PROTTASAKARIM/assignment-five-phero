@@ -7,7 +7,7 @@ export type TPreviousPassword = {
 
 export type TUser = {
   username: string;
-  email: string;
+  email?: string;
   password: string;
   role: 'user' | 'admin';
   previousPassword?: TPreviousPassword[];

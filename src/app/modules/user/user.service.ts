@@ -18,7 +18,7 @@ const loginUser = async (payload: TLoginUser) => {
   const password = payload.password;
   const user = await User.findOne(
     { username: username },
-    { username: 1, password: 1, role: 1, email: 1 },
+    { username: 1, password: 1, role: 1 },
   );
   console.log('user', user);
 
@@ -33,7 +33,6 @@ const loginUser = async (payload: TLoginUser) => {
   const jwtPayload = {
     _id: user._id,
     role: user.role,
-    email: user.email,
   };
 
   const accessToken = createToken(
@@ -47,7 +46,7 @@ const loginUser = async (payload: TLoginUser) => {
     _id: user._id,
     username: user.username,
     role: user.role,
-    email: user.email,
+
   };
 
   return { user: userDetails, token: accessToken };
@@ -62,7 +61,6 @@ const changePassword = async (
   const userDetails = await User.findById(userData._id, {
     _id: 1,
     username: 1,
-    email: 1,
     password: 1,
     role: 1,
     previousPassword: 1,
@@ -127,31 +125,31 @@ const changePassword = async (
 
   if (
     previousPasswordsMatching !== undefined &&
-   (previousPasswordsMatching >0  || previousPasswordsMatching <= 2)
+    (previousPasswordsMatching > 0 || previousPasswordsMatching <= 2)
   ) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const matchPromises :any = userDetails?.previousPassword?.map(async (prevPassword) => {
-        // const hashPassword = await bcrypt.hash(
-        //   payload.currentPassword,
-        //   Number(config.bcrypt_salt_rounds),
-        // );
-        const match = await bcrypt.compare(payload.newPassword, prevPassword.password);
-        return match;
-      });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const matchPromises: any = userDetails?.previousPassword?.map(async (prevPassword) => {
+      // const hashPassword = await bcrypt.hash(
+      //   payload.currentPassword,
+      //   Number(config.bcrypt_salt_rounds),
+      // );
+      const match = await bcrypt.compare(payload.newPassword, prevPassword.password);
+      return match;
+    });
 
-      const matches = await Promise.all(matchPromises);
-      
-      const filteredPassword= userDetails?.previousPassword?.filter( async prev=>{
-        await bcrypt.compare(payload.newPassword, prev.password)
-      })
+    const matches = await Promise.all(matchPromises);
 
-      if (matches.some((match) => match)) {
-        console.log("match",match)
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          `Password change failed. Ensure the new password is unique and not among the last 2 used ${ filteredPassword !== undefined ? filteredPassword[0]?.changeTime : ""}`,
-        );
-      }
+    const filteredPassword = userDetails?.previousPassword?.filter(async prev => {
+      await bcrypt.compare(payload.newPassword, prev.password)
+    })
+
+    if (matches.some((match) => match)) {
+      console.log("match", match)
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Password change failed. Ensure the new password is unique and not among the last 2 used ${filteredPassword !== undefined ? filteredPassword[0]?.changeTime : ""}`,
+      );
+    }
   }
 
   const matchNewPassword = await bcrypt.compare(
